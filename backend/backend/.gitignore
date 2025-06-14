@@ -1,0 +1,78 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environments
+.env/
+.venv/
+venv/
+ENV/
+env/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Django/Migrations
+*.log
+*.pot
+*.pyc
+*.sqlite3
+db.sqlite3
+*.mo
+*.pid
+*.swp
+*.swo
+*.bak
+*.orig
+*.~ 
+*.tmp
+
+# Django cache & media
+media/
+staticfiles/
+static/
+*.tar.gz
+*.egg-info/
+*.egg
+__pycache__/
+local_settings.py
+
+# Pipenv / Poetry / Requirements
+Pipfile.lock
+poetry.lock
+
+# JetBrains IDEs (e.g., PyCharm)
+.idea/
+
+# Secrets
+*.env
+.env.*
+secrets.json
+
+# Coverage reports
+htmlcov/
+.coverage
+coverage.xml
+
+# MyPy / Pyright / Pylint
+.mypy_cache/
+.pyright/
+.pytest_cache/
+.pylint.d/
+
+# Compiled files
+*.so
+*.dll
+*.o
+*.a
