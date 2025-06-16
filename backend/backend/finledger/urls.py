@@ -15,5 +15,6 @@ urlpatterns = [
     path('fetch_debtors/', views.fetch_debtors, name='fetch_debtors'),
     path('fetch_debts/', views.fetch_debts, name='fetch_debts'),
     path('fetch_history/', views.fetch_history, name='fetch_history'),
+    path('delete_debtor/', views.delete_debtor, name='delete_debtor'),
 
 ]

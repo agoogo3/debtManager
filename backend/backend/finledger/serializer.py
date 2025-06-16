@@ -11,6 +11,14 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ["first_name","last_name","username","email","password"]
 
+    def validate(self, data):
+        password = data['password']
+
+        if len(password) <= 5:
+            raise serializers.ValidationError({'message':'Password must be more than 5 characters long'})
+
+        return data
+
     def create(self, validated_data):
         if User.objects.filter(email = validated_data['email']).exists():
             raise serializers.ValidationError({"username":"A user with this email already exists"})
@@ -27,6 +35,14 @@ class AddDebtorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Debtor
         fields = ['fullname','phone']
+
+    def validate(self, data):
+        phone = data['phone']
+        if len(phone) <= 10: 
+            raise serializers.ValidationError({'message':'Phone must be more than 10 characters long'})
+        return data
+    
+
     def create(self, validated_data):
         creditor = self.context['request'].user
         phone = validated_data['phone']
@@ -44,9 +60,12 @@ class AddDebtorSerializer(serializers.ModelSerializer):
 class PayDebtSerializer(serializers.ModelSerializer):
     class Meta:
         model = DebtPayment
-        fields = ["amount_paid","debt"]
+        fields = ["amount_paid","debt",]
 
     def validate(self, data):
+        creditor = self.context['request'].user
+        amount_paid = data['amount_paid']
+
         try:
            debt = Debt.objects.get(id=data['debt'].id)
         except Debt.DoesNotExist:
@@ -55,14 +74,19 @@ class PayDebtSerializer(serializers.ModelSerializer):
         if debt.amount - debt.paid < data['amount_paid']:
             raise serializers.ValidationError({'message':"Payment exceeds remaining debt amount"})
         
-        if not Debtor.objects.filter(creditor=data['creditor'], id=data['debtor']).exists():
-                raise serializers.ValidationError({"message": "Debtor does not exist for this creditor"})
+        if debt.creditor != creditor:
+            raise serializers.ValidationError({'message':'You are not allowed to pay this debt'})
+        
+        if amount_paid < 1 :
+            raise serializers.ValidationError({'message':'Payment cannot be less than 1'})
+        
+        data['debt'] = debt
         
         return data
 
     def create(self, validated_data):
         creditor = self.context['request'].user
-        debtor = validated_data['debtor']
+        debtor = validated_data['debt'].debtor
         debt = validated_data['debt']
         amount_paid = validated_data['amount_paid']
 
@@ -74,8 +98,8 @@ class PayDebtSerializer(serializers.ModelSerializer):
             
             debt.save()
 
-            debt_amount = Debt.objects.filter(creditor=creditor,debtor=debtor).aggregate(total=Sum('amount'))['amount'] or 0
-            paid_amount = Debt.objects.filter(creditor=creditor,debtor=debtor).aggregate(total=Sum('paid'))['paid'] or 0
+            debt_amount = Debt.objects.filter(creditor=creditor,debtor=debtor).aggregate(total=Sum('amount'))['total'] or 0
+            paid_amount = Debt.objects.filter(creditor=creditor,debtor=debtor).aggregate(total=Sum('paid'))['total'] or 0
             total_balance = debt_amount - paid_amount
 
             History.objects.create(
@@ -114,6 +138,11 @@ class AddDebtSerializer(serializers.ModelSerializer):
         model = Debt
         fields = ['debtor', 'amount', 'desc']
 
+    def validate(self, data):
+        if data['amount'] < 1 :
+            raise serializers.ValidationError({'message':'Amount should be more than 0'})
+        return data
+
     def create(self, validated_data):
         with transaction.atomic():
             creditor = self.context['request'].user
@@ -140,5 +169,34 @@ class AddDebtSerializer(serializers.ModelSerializer):
             )
 
             return debt
+        
+class DeleteDebtorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Debtor
+        fields = ['phone']
+    
+    def validate(self, data):
+        creditor = self.context['request'].user
+        debtor_phone = data.get('phone')
+
+        if not debtor_phone:
+            raise serializers.ValidationError({'message': "Debtor phone is required"})
+
+        try:
+            debtor = Debtor.objects.get(phone = debtor_phone, creditor=creditor)
+        except Debtor.DoesNotExist:
+            raise serializers.ValidationError({'message': "Debtor does not exist"})
+
+        if debtor.creditor != creditor:
+            raise serializers.ValidationError({'message': "You don't have permission to delete this debtor"})
+
+        # Store for use in create()
+        self.debtor_instance = debtor
+
+        return data
+    
+    def create(self, validated_data):
+        self.debtor_instance.delete()
+        return {'message': 'Debtor deleted successfully'}
 
             

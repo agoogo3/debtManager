@@ -21,7 +21,7 @@ class Debt(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-          return f"{self.debtor} - {self.amount}"
+          return f"{self.debtor} - {self.is_paid} -{self.amount}"
     
 class DebtPayment(models.Model):
      debt = models.ForeignKey(Debt, on_delete=models.CASCADE)
@@ -38,5 +38,5 @@ class History(models.Model):
     recorded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-          return f"{self.debtor} - {self.amount}"
+          return f"{self.debtor} - {self.is_payment} - {self.amount}"
      
