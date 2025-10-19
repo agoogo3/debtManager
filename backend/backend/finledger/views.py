@@ -68,9 +68,10 @@ def register_user(request):
 def add_debtor(request):
     serializer = AddDebtorSerializer(data = request.data, context={'request':request})
     if serializer.is_valid():
-        serializer.save()
+        debtor = serializer.save()
+        response_serializer = DebtorSerializer(debtor)
         # TO:DO-- Alert debtor through text message
-        return Response({'message':"Debtor added successfully"},status=status.HTTP_201_CREATED)
+        return Response({'message':response_serializer.data},status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST )
 
 

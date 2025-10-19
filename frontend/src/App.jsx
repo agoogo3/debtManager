@@ -11,6 +11,7 @@ import { DataProvider } from "./context/dataContext";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import Not_found from "./routes/Not_found";
 import AddDebtModal from "./utils/AddDebtModal";
+import AddDebtorModal from "./utils/AddDebtorModal";
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
       <DataProvider>
         <Header />
         <AddDebtModal/>
+        <AddDebtorModal/>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />

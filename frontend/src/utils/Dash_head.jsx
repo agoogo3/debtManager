@@ -15,7 +15,7 @@ const Dash_head = () => {
     }, 0);
     setTotalDebts(totalDebts)
     setTotalDebtsPaid(totalDebtsPaid)
-  }, [debts]);
+  }, [debts,debtors]);
 
   return (
     <div>
@@ -50,7 +50,11 @@ const Dash_head = () => {
             >
               Add New Debt
             </button>
-            <button className="btn btn-light debt-btn mx-auto">
+            <button
+              className="btn btn-light debt-btn mx-auto"
+              data-bs-toggle="modal"
+              data-bs-target="#addDebtorModal"
+            >
               Add New Debtor
             </button>
           </div>
@@ -86,7 +90,13 @@ const Dash_head = () => {
           >
             Add New Debt
           </button>
-          <button className="btn btn-outline-dark ">Add New Debtor</button>
+          <button
+            className="btn btn-outline-dark "
+            data-bs-toggle="modal"
+            data-bs-target="#addDebtorModal"
+          >
+            Add New Debtor
+          </button>
         </div>
       </div>
     </div>

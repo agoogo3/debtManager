@@ -36,7 +36,7 @@ class AddDebtorSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         phone = data['phone']
-        if len(phone) <= 10: 
+        if len(phone) <= 9: 
             raise serializers.ValidationError({'message':'Phone must be more than 10 characters long'})
         return data
     
@@ -45,7 +45,7 @@ class AddDebtorSerializer(serializers.ModelSerializer):
         creditor = self.context['request'].user
         phone = validated_data['phone']
         if Debtor.objects.filter(phone = phone, creditor = creditor).exists():
-            raise serializers.ValidationError({'message':'Debtor already exists'})
+            raise serializers.ValidationError({'message':'A debtor with this number already exists'})
         
         debtor = Debtor(
             fullname = validated_data['fullname'],

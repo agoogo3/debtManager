@@ -93,7 +93,6 @@ const AddDebtForm = () => {
             Add Debt
           </button>
         )}
-       
 
         <input
           type="reset"

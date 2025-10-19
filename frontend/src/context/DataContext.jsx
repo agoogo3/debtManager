@@ -140,8 +140,41 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  // Handle Add debtor
+  const handleAddDebtor = async (e) => {
+    const form = e.target;
+    const name = form.name.value;
+    const phone = form.phone.value;
+    const phone_regex = /^[0-9]+$/;
+    const name_regex = /^[A-Za-z\s]+$/;
+    const test_name = name_regex.test(name);
+    const test_phone = phone_regex.test(phone);
+    if (name == "" || !test_name || !test_phone || phone.length < 10) {
+      setErrMessage({ message: "Invalid Credentials", show: true });
+      return;
+    }
+    try {
+      const data = {
+        fullname: name,
+        phone: phone,
+      };
+      const response = await api.post("add_debtor/", data, {
+        headers: {
+          Authorization: `Bearer ${auth.access}`,
+        },
+      });
+      setDebtors([response.data.message,...debtors]);
+      console.log(response.data.message);
+      setErrMessage({ message: "", show: true });
+      form.classList.remove("was-validated");
+      form.reset();
+    } catch (err) {
+      console.log(err.response.data);
+      setErrMessage({ message: err.response.data.message, show: true });
+    }
+  };
+
   // Handle Add debt
-  // console.log(debts)
   const handleAddDebt = async (e) => {
     e.preventDefault();
     const form = e.target;
@@ -164,7 +197,7 @@ export const DataProvider = ({ children }) => {
             Authorization: `Bearer ${auth.access}`,
           },
         });
-        setDebts([response.data.message,...debts]);
+        setDebts([response.data.message, ...debts]);
         setErrMessage({ message: "", show: true });
         form.classList.remove("was-validated");
         form.reset();
@@ -217,6 +250,7 @@ export const DataProvider = ({ children }) => {
         user,
         handleLogin,
         handleCreateAccount,
+        handleAddDebtor,
         handleAddDebt,
         passwordError,
         con_passwordError,
