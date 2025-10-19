@@ -1,9 +1,11 @@
 import React from 'react'
 
 const Footer = () => {
+  const date = new Date()
+  
   return (
     <div>
-      Footer
+      &copy; {date.getFullYear()} Finledger. All Rights Reserved
     </div>
   )
 }

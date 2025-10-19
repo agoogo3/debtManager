@@ -28,14 +28,14 @@ class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
 # Send email function
-def sendMail(email, subject, message):
-    send_mail(
-        subject= subject, #subject,
-        message= message,   # message
-        from_email=os.environ.get('EMAIL_HOST_USER'),
-        recipient_list= [email]
+# def sendMail(email, subject, message):
+#     send_mail(
+#         subject= subject, #subject,
+#         message= message,   # message
+#         from_email=os.environ.get('EMAIL_HOST_USER'),
+#         recipient_list= [email]
 
-    )
+#     )
 
 #Register user
 @api_view(["POST"])
@@ -44,20 +44,20 @@ def register_user(request):
     serializer = RegisterSerializer(data = request.data)
     if serializer.is_valid():
         serializer.save()
-        message = f"""
-        Hi {request.data.get('first_name')},
+#         message = f"""
+#         Hi {request.data.get('first_name')},
 
-        Welcome to FinLedger! 🎉
+#         Welcome to FinLedger! 🎉
 
-Your account has been created successfully. You can now log in and start managing debts with ease. 
+# Your account has been created successfully. You can now log in and start managing debts with ease. 
 
-If you didn't sign up for this account, please ignore this message.
+# If you didn't sign up for this account, please ignore this message.
 
-Thank you for joining us!
+# Thank you for joining us!
 
-        – The FinLedger Team
-        """
-        sendMail(request.data.get('email'),"Welcome to finledger! 🎉",message,)
+#         – The FinLedger Team
+#         """
+#         sendMail(request.data.get('email'),"Welcome to finledger! 🎉",message,)
         return Response({'message':'User created Successfully'},status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -90,9 +90,10 @@ def delete_debtor(request):
 def add_debt(request):
     serializer = AddDebtSerializer(data = request.data, context={'request':request})
     if serializer.is_valid():
-        serializer.save()
+        debt = serializer.save()
+        response_serializer = DebtSerializer(debt)
         # TO:DO-- Alert debtor through text message
-        return Response({'message':"Debt added successfully"},status=status.HTTP_201_CREATED)
+        return Response({'message':response_serializer.data},status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST )
 
 

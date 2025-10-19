@@ -6,6 +6,13 @@ import { createContext, useState, useEffect } from "react";
 const DataContext = createContext({});
 
 export const DataProvider = ({ children }) => {
+  const [passwordError, setPasswordError] = useState(false);
+  const [usernameError, setUsernameError] = useState(false);
+  const [con_passwordError, setCon_passwordError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [debts, setDebts] = useState([]);
+  const [debtors, setDebtors] = useState([]);
+  const [errMessage, setErrMessage] = useState({ message: "", show: false });
   const navigate = useNavigate();
 
   const [auth, setAuth] = useState(() =>
@@ -19,26 +26,26 @@ export const DataProvider = ({ children }) => {
       : null
   );
 
-  const refreshToken = async(refresh)=>{
-    try{
-        const response = await api.post("token/refresh/",{
-            refresh : refresh
-        });
-        // console.log("Refresh" + refresh);
+  const refreshToken = async (refresh) => {
+    try {
+      const response = await api.post("token/refresh/", {
+        refresh: refresh,
+      });
+      // console.log("Refresh" + refresh);
 
-        const updatedToken = {
-            access:response.data.access,
-            refresh : auth.refresh
-        }
-        localStorage.setItem("auth", JSON.stringify(updatedToken));
-        setUser(jwtDecode(response.data.access))
-        setAuth(updatedToken)
-        console.log("updated")
-    }catch(error){
-        console.log(error.response)
-        logout()
+      const updatedToken = {
+        access: response.data.access,
+        refresh: auth.refresh,
+      };
+      localStorage.setItem("auth", JSON.stringify(updatedToken));
+      setUser(jwtDecode(response.data.access));
+      setAuth(updatedToken);
+      console.log("updated");
+    } catch (error) {
+      console.log(error.response);
+      logout();
     }
-  }
+  };
 
   // Refreshing token
   useEffect(() => {
@@ -48,12 +55,11 @@ export const DataProvider = ({ children }) => {
       let refreshIn = expiredTime - now;
       let updateIn = (refreshIn - 5) * 1000;
 
-      const interval = setInterval(()=>{
-        refreshToken(auth.refresh)
-      },updateIn)
+      const interval = setInterval(() => {
+        refreshToken(auth.refresh);
+      }, updateIn);
 
-      return(()=>clearInterval(interval))
-
+      return () => clearInterval(interval);
     }
   }, [auth]);
 
@@ -65,28 +71,162 @@ export const DataProvider = ({ children }) => {
   };
 
   // Handling Login
-  const handleLogin = async () => {
-    const req = {
-      username: "",
-      password: "",
-    };
-    try {
-      const response = await api.post("token/", req);
-      console.log(jwtDecode(response.data.access));
-      localStorage.setItem("auth", JSON.stringify(response.data));
-      setAuth(response.data);
-      setUser(jwtDecode(response.data.access));
-      navigate("/dashboard");
-    } catch (error) {
-      console.log(error.response.data);
+  const handleLogin = async (e) => {
+    setIsLoading(true);
+    const form = e.target;
+    const formData = new FormData(form);
+    if (form.username.value == "" || form.password.value == "") {
+      setErrMessage({ message: "Fields can not be empty", show: true });
+    } else {
+      try {
+        const response = await api.post("token/", formData);
+        console.log(jwtDecode(response.data.access));
+        localStorage.setItem("auth", JSON.stringify(response.data));
+        setAuth(response.data);
+        setUser(jwtDecode(response.data.access));
+        location.href = "/dashboard";
+      } catch (error) {
+        setErrMessage({ message: "Invalid Credentials", show: true });
+      }
+    }
+    setIsLoading(false);
+  };
+
+  // Handle Create Account
+  const handleCreateAccount = async (e) => {
+    e.preventDefault();
+
+    const form = e.target;
+    const password = form.password.value;
+    const con_password = form.con_password.value;
+    const name = form.name.value;
+    const email = form.email.value;
+    const username = form.username.value;
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    const usernameRegex = /^[a-zA-Z0-9._-]{3,16}$/;
+
+    const isPasswordValid = passwordRegex.test(password);
+    const isUsernameValid = usernameRegex.test(username);
+    const isConfirmPasswordValid = password === con_password;
+
+    setPasswordError(!isPasswordValid);
+    setUsernameError(!isUsernameValid);
+    setCon_passwordError(!isConfirmPasswordValid);
+
+    if (isPasswordValid && isConfirmPasswordValid) {
+      setIsLoading(true);
+      const request = {
+        first_name: name,
+        last_name: "",
+        username: username,
+        email: email,
+        password: password,
+      };
+      try {
+        const response = await api.post("register/", request);
+        console.log(response.data);
+        setErrMessage({ message: "", show: true });
+        form.reset();
+        form.classList.remove("was-validated");
+      } catch (error) {
+        setErrMessage({
+          message: error.response.data.username,
+          show: true,
+        });
+      }
+
+      setIsLoading(false);
     }
   };
+
+  // Handle Add debt
+  // console.log(debts)
+  const handleAddDebt = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    if (
+      form.debtor.value == "" ||
+      form.amount.value == "" ||
+      form.desc.value == ""
+    ) {
+      setErrMessage({ message: "Fields can not be empty", show: true });
+    } else {
+      setIsLoading(true);
+      try {
+        const data = {
+          debtor: form.debtor.value,
+          amount: form.amount.value,
+          desc: form.desc.value,
+        };
+        const response = await api.post("add_debt/", data, {
+          headers: {
+            Authorization: `Bearer ${auth.access}`,
+          },
+        });
+        setDebts([response.data.message,...debts]);
+        setErrMessage({ message: "", show: true });
+        form.classList.remove("was-validated");
+        form.reset();
+      } catch (e) {
+        setErrMessage({ message: e.response.data.message[0], show: true });
+      }
+    }
+    setIsLoading(false);
+  };
+
+  // Fetch Debts
+  useEffect(() => {
+    const fetchDebt = async () => {
+      try {
+        const auth = JSON.parse(localStorage.getItem("auth"));
+        const response = await api.get("/fetch_debts", {
+          headers: {
+            Authorization: `Bearer ${auth.access}`,
+          },
+        });
+        setDebts(response.data);
+      } catch (err) {
+        console.log(err.response);
+      }
+    };
+    fetchDebt();
+  }, []);
+
+  // fetch Debtors
+  useEffect(() => {
+    const fetchDebt = async () => {
+      try {
+        const auth = JSON.parse(localStorage.getItem("auth"));
+        const response = await api.get("/fetch_debtors", {
+          headers: {
+            Authorization: `Bearer ${auth.access}`,
+          },
+        });
+        setDebtors(response.data);
+      } catch (err) {
+        console.log(err.response);
+      }
+    };
+    fetchDebt();
+  }, []);
 
   return (
     <DataContext.Provider
       value={{
         user,
         handleLogin,
+        handleCreateAccount,
+        handleAddDebt,
+        passwordError,
+        con_passwordError,
+        usernameError,
+        isLoading,
+        errMessage,
+        setErrMessage,
+        debts,
+        debtors,
+        logout,
       }}
     >
       {children}

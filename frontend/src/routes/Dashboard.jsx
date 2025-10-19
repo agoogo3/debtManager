@@ -1,10 +1,11 @@
 import React from 'react'
+import Dash_head from '../utils/Dash_head'
 
 const Dashboard = () => {
   return (
-    <div>
-      Dashboard
-    </div>
+    <main className='container middle'>
+      <Dash_head />
+    </main>
   )
 }
 
