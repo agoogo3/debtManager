@@ -112,18 +112,15 @@ class PayDebtSerializer(serializers.ModelSerializer):
         
 
 
-
-
-class DebtorSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Debtor
-        fields = '__all__'
-
-
 class DebtSerializer(serializers.ModelSerializer):
-    # debtor = DebtorSerializer(Debtor,read_only=True)
     class Meta:
         model = Debt
+        fields = '__all__'
+
+class DebtorSerializer(serializers.ModelSerializer):
+    debts = DebtSerializer(Debt, many=True, read_only=True)
+    class Meta:
+        model = Debtor
         fields = '__all__'
 
 class HistorySerializer(serializers.ModelSerializer):

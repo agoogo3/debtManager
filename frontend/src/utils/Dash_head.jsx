@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useContext } from "react";
 import DataContext from "../context/dataContext";
+import DebtorCard from "./DebtorCard";
 
 const Dash_head = () => {
   const { debts, debtors } = useContext(DataContext);
-  const [totalDebts, setTotalDebts] = useState(0)
-  const [totalDebtsPaid, setTotalDebtsPaid] = useState(0)
+  const [debtor, setDebtor] = useState({});
+  const [totalDebts, setTotalDebts] = useState(0);
+  const [totalDebtsPaid, setTotalDebtsPaid] = useState(0);
   useEffect(() => {
     const totalDebts = debts.reduce((a, b) => {
       return a + parseFloat(b.amount);
@@ -13,9 +15,17 @@ const Dash_head = () => {
     const totalDebtsPaid = debts.reduce((a, b) => {
       return a + parseFloat(b.paid);
     }, 0);
-    setTotalDebts(totalDebts)
-    setTotalDebtsPaid(totalDebtsPaid)
-  }, [debts,debtors]);
+    setTotalDebts(totalDebts);
+    setTotalDebtsPaid(totalDebtsPaid);
+
+    if (debtors && debtors.length > 0) {
+      const debtorr = debtors[Math.floor(Math.random() * debtors.length)];
+      setDebtor(debtorr);
+    }
+
+  }, [debts, debtors]);
+
+  
 
   return (
     <div>
@@ -58,9 +68,7 @@ const Dash_head = () => {
               Add New Debtor
             </button>
           </div>
-          <div className="card bg-light debtor-card mt-4 shadow-lg mx-auto">
-            <div className="card-body">Debtor Card</div>
-          </div>
+          <DebtorCard debtor={debtor} />
         </div>
       </div>
       {/* Large container */}
@@ -75,7 +83,7 @@ const Dash_head = () => {
             <h4 style={{ paddingLeft: "15px" }}>GHC {totalDebtsPaid}</h4>
           </div>
           <div className="col shadow card bg-secondary text-white">
-            <p style={{ paddingLeft: "15px" }}>Total Debts Paid</p>
+            <p style={{ paddingLeft: "15px" }}>Total Number of Debtors</p>
             <h4 style={{ paddingLeft: "15px" }}>{debtors.length}</h4>
           </div>
         </div>

@@ -167,7 +167,8 @@
   top: 25px;
 }
 .debtor-card .card-body{
-  height: 90px;
+  height: 100px;
+  position: relative;
 }
 .dash-head-row .col{
   height: 120px;
@@ -185,6 +186,24 @@
 .modal-title{
   font-family: outfit;
   font-weight: 800;
+}
+
+.details{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  padding: 10px;
+  text-transform: capitalize;
+  height: 100%;
+  position: absolute;
+  top: 0%;
+  left: 20%;
+  
+}
+.details p{
+ margin-bottom: -2px;
+ position: relative;
+ bottom: 10px;
 }
 
 

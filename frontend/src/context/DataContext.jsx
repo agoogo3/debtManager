@@ -80,13 +80,13 @@ export const DataProvider = ({ children }) => {
     } else {
       try {
         const response = await api.post("token/", formData);
-        console.log(jwtDecode(response.data.access));
+        // console.log(jwtDecode(response.data.access));
         localStorage.setItem("auth", JSON.stringify(response.data));
         setAuth(response.data);
         setUser(jwtDecode(response.data.access));
-        location.href = "/dashboard";
+        navigate("/dashboard");
       } catch (error) {
-        setErrMessage({ message: "Invalid Credentials", show: true });
+        setErrMessage({ message: "Incorrect Password/Username", show: true });
       }
     }
     setIsLoading(false);
@@ -208,42 +208,43 @@ export const DataProvider = ({ children }) => {
     setIsLoading(false);
   };
 
-  // Fetch Debts
-  useEffect(() => {
-    const fetchDebt = async () => {
-      try {
-        const auth = JSON.parse(localStorage.getItem("auth"));
-        const response = await api.get("/fetch_debts", {
-          headers: {
-            Authorization: `Bearer ${auth.access}`,
-          },
-        });
-        setDebts(response.data);
-      } catch (err) {
-        console.log(err.response);
-      }
-    };
-    fetchDebt();
-  }, []);
+  
+    // Fetch Debts
+    useEffect(() => {
+      const fetchDebt = async () => {
+        try {
+          const auth = JSON.parse(localStorage.getItem("auth"));
+          const response = await api.get("/fetch_debts", {
+            headers: {
+              Authorization: `Bearer ${auth.access}`,
+            },
+          });
+          setDebts(response.data);
+        } catch (err) {
+          console.log(err.response);
+        }
+      };
+      fetchDebt();
+    }, [user]);
 
-  // fetch Debtors
-  useEffect(() => {
-    const fetchDebt = async () => {
-      try {
-        const auth = JSON.parse(localStorage.getItem("auth"));
-        const response = await api.get("/fetch_debtors", {
-          headers: {
-            Authorization: `Bearer ${auth.access}`,
-          },
-        });
-        setDebtors(response.data);
-      } catch (err) {
-        console.log(err.response);
-      }
-    };
-    fetchDebt();
-  }, []);
-
+    // fetch Debtors
+    useEffect(() => {
+      const fetchDebt = async () => {
+        try {
+          const auth = JSON.parse(localStorage.getItem("auth"));
+          const response = await api.get("/fetch_debtors", {
+            headers: {
+              Authorization: `Bearer ${auth.access}`,
+            },
+          });
+          setDebtors(response.data);
+        } catch (err) {
+          console.log(err.response);
+        }
+      };
+      fetchDebt();
+    }, [user]);
+  
   return (
     <DataContext.Provider
       value={{

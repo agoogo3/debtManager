@@ -1,17 +1,29 @@
-import React,{useContext,useEffect} from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import AddDebtForm from "./AddDebtForm";
 import DataContext from "../context/DataContext";
 
-
 const AddDebtModal = () => {
-  const {errMessage,setErrMessage} = useContext(DataContext)
+  const { errMessage, setErrMessage } = useContext(DataContext);
 
-   useEffect(() => {
-      setErrMessage({ message: "", show: false });
-    }, []);
+  // Removing any error message when toggling modals
+  const addDebtModal = useRef(null);
+  useEffect(() => {
+    const modal = addDebtModal.current;
+    if (!modal) return;
+
+    const onShow = () => setErrMessage({ message: "", show: false });
+    modal.addEventListener("show.bs.modal", onShow);
+
+    return () => modal.removeEventListener("show.bs.modal", onShow);
+  }, []);
 
   return (
-    <div className="modal fade" tabIndex="-1" id="addDebtModal">
+    <div
+      className="modal fade"
+      tabIndex="-1"
+      id="addDebtModal"
+      ref={addDebtModal}
+    >
       <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content">
           <div className="modal-header border-0">

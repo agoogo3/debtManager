@@ -12,6 +12,7 @@ import ProtectedRoute from "./utils/ProtectedRoute";
 import Not_found from "./routes/Not_found";
 import AddDebtModal from "./utils/AddDebtModal";
 import AddDebtorModal from "./utils/AddDebtorModal";
+import Debtor from "./routes/Debtor";
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<Profile />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/debtor/:id" element={<Debtor />} />
           </Route>
         </Routes>
         <Footer />
