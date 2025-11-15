@@ -119,7 +119,7 @@ def pay_debt(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def fetch_debtors(request):
-    debtors = Debtor.objects.filter(creditor = request.user)
+    debtors = Debtor.objects.filter(creditor = request.user).order_by('-created_at')
     serializer = DebtorSerializer(debtors, many=True)
     return Response(serializer.data)
 

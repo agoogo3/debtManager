@@ -21,16 +21,17 @@ function App() {
     <>
       <DataProvider>
         <Header />
-        <AddDebtModal/>
-        <AddDebtorModal/>
+        <AddDebtModal />
+        <AddDebtorModal />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="*" element={<Not_found />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<Profile />} />
-            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/debtor/:id" element={<Debtor />} />
           </Route>
         </Routes>

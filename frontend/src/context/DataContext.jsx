@@ -42,7 +42,6 @@ export const DataProvider = ({ children }) => {
       setAuth(updatedToken);
       console.log("updated");
     } catch (error) {
-      console.log(error.response);
       logout();
     }
   };
@@ -163,7 +162,7 @@ export const DataProvider = ({ children }) => {
           Authorization: `Bearer ${auth.access}`,
         },
       });
-      setDebtors([response.data.message,...debtors]);
+      setDebtors([response.data.message, ...debtors]);
       console.log(response.data.message);
       setErrMessage({ message: "", show: true });
       form.classList.remove("was-validated");
@@ -197,7 +196,17 @@ export const DataProvider = ({ children }) => {
             Authorization: `Bearer ${auth.access}`,
           },
         });
-        setDebts([response.data.message, ...debts]);
+        setDebts([...debts, response.data.message]);
+        const idd = response.data.message.debtor;
+        const updatedDebtor = debtors.map((debtor) => {
+          if (debtor.id == idd) {
+            return {...debtor, debts:[...debtor.debts,response.data.message]}
+          }else{
+            return debtor
+          }
+        });
+        setDebtors(updatedDebtor)
+
         setErrMessage({ message: "", show: true });
         form.classList.remove("was-validated");
         form.reset();
@@ -208,43 +217,42 @@ export const DataProvider = ({ children }) => {
     setIsLoading(false);
   };
 
-  
-    // Fetch Debts
-    useEffect(() => {
-      const fetchDebt = async () => {
-        try {
-          const auth = JSON.parse(localStorage.getItem("auth"));
-          const response = await api.get("/fetch_debts", {
-            headers: {
-              Authorization: `Bearer ${auth.access}`,
-            },
-          });
-          setDebts(response.data);
-        } catch (err) {
-          console.log(err.response);
-        }
-      };
-      fetchDebt();
-    }, [user]);
+  // Fetch Debts
+  useEffect(() => {
+    const fetchDebt = async () => {
+      try {
+        const auth = JSON.parse(localStorage.getItem("auth"));
+        const response = await api.get("/fetch_debts", {
+          headers: {
+            Authorization: `Bearer ${auth.access}`,
+          },
+        });
+        setDebts(response.data);
+      } catch (err) {
+        console.log(err.response);
+      }
+    };
+    fetchDebt();
+  }, [user]);
 
-    // fetch Debtors
-    useEffect(() => {
-      const fetchDebt = async () => {
-        try {
-          const auth = JSON.parse(localStorage.getItem("auth"));
-          const response = await api.get("/fetch_debtors", {
-            headers: {
-              Authorization: `Bearer ${auth.access}`,
-            },
-          });
-          setDebtors(response.data);
-        } catch (err) {
-          console.log(err.response);
-        }
-      };
-      fetchDebt();
-    }, [user]);
-  
+  // fetch Debtors
+  useEffect(() => {
+    const fetchDebt = async () => {
+      try {
+        const auth = JSON.parse(localStorage.getItem("auth"));
+        const response = await api.get("/fetch_debtors", {
+          headers: {
+            Authorization: `Bearer ${auth.access}`,
+          },
+        });
+        setDebtors(response.data);
+      } catch (err) {
+        console.log(err.response);
+      }
+    };
+    fetchDebt();
+  }, [user]);
+
   return (
     <DataContext.Provider
       value={{

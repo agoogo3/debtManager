@@ -24,7 +24,7 @@ const DebtorCard = ({ debtor }) => {
   return (
     <div className="card bg-light debtor-card mt-4 shadow-lg mx-auto">
       <div className="d-flex">
-        {debtor ? (
+        {Object.keys(debtor).length > 0 ? (
           <div className="card-body d-flex">
             <Avatar name={debtor.fullname} size={50} />
             <div className="details">

@@ -15,7 +15,7 @@ const Dash_head = () => {
     const totalDebtsPaid = debts.reduce((a, b) => {
       return a + parseFloat(b.paid);
     }, 0);
-    setTotalDebts(totalDebts);
+    setTotalDebts(totalDebts - totalDebtsPaid);
     setTotalDebtsPaid(totalDebtsPaid);
 
     if (debtors && debtors.length > 0) {
@@ -34,7 +34,7 @@ const Dash_head = () => {
           <div className="row row-cols-2 pt-5">
             <div className="col">
               <p style={{ textAlign: "left", paddingLeft: "15px" }}>
-                Total Debts
+                Current Debt
               </p>
               <h4 style={{ textAlign: "left", paddingLeft: "15px" }}>
                 GHC {totalDebts}

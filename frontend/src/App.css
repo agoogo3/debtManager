@@ -206,6 +206,18 @@
  bottom: 10px;
 }
 
+/* Chart */
+.chart-card{
+  position: relative;
+  right: 2px;
+}
+.table-body{
+  overflow-y: scroll;
+  scrollbar-width: none;
+}
+.table-body::-webkit-scrollbar-button{
+  display: none;
+}
 
 
 
